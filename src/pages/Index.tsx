@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Coins, Calendar, TrendingUp, Heart, FileText } from "lucide-react";
+import { Users, Coins, Calendar, TrendingUp, Heart, FileText, Settings } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import Dashboard from "@/components/Dashboard";
 import MemberManagement from "@/components/MemberManagement";
@@ -12,6 +12,7 @@ import LoanManagement from "@/components/LoanManagement";
 import InvestmentManagement from "@/components/InvestmentManagement";
 import DonationManagement from "@/components/DonationManagement";
 import Reports from "@/components/Reports";
+import UserManagement from "@/components/UserManagement";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -32,6 +33,8 @@ const Index = () => {
         return <DonationManagement />;
       case "reports":
         return <Reports />;
+      case "users":
+        return <UserManagement />;
       default:
         return <Dashboard onNavigate={setActiveTab} />;
     }

@@ -4,13 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Plus, DollarSign, Clock, RefreshCw } from "lucide-react";
+import { Calendar, Plus, DollarSign, Clock, RefreshCw, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 const LoanManagement = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [refundingLoan, setRefundingLoan] = useState<any>(null);
   const [isRefundDialogOpen, setIsRefundDialogOpen] = useState(false);
   const [refundAmount, setRefundAmount] = useState("");
@@ -18,6 +19,7 @@ const LoanManagement = () => {
     {
       id: 1,
       memberName: "ফাতেমা খাতুন",
+      memberPhone: "০১৮১২৩৪৫৬৭৩",
       amount: 50000,
       purpose: "ব্যবসার জন্য",
       date: "২০২৪-০৫-১৫",
@@ -29,9 +31,10 @@ const LoanManagement = () => {
     {
       id: 2,
       memberName: "করিম মিয়া",
+      memberPhone: "০১৯১২৩৪৫৬৭৪",
       amount: 30000,
       purpose: "চিকিৎসার জন্য",
-      date: "২০২ৄ-০৪-২০",
+      date: "২০২৪-০৪-২০",
       status: "সম্পন্ন",
       installments: 10,
       paidInstallments: 10,
@@ -40,6 +43,7 @@ const LoanManagement = () => {
     {
       id: 3,
       memberName: "রহিম উদ্দিন",
+      memberPhone: "০১৭১২৩৪৫৬৭২",
       amount: 75000,
       purpose: "বাড়ি মেরামত",
       date: "২০২৪-০৬-০১",
@@ -65,6 +69,7 @@ const LoanManagement = () => {
       const loan = {
         id: loans.length + 1,
         memberName: newLoan.memberName,
+        memberPhone: "০১৭xxxxxxxx", // Default phone
         amount: parseInt(newLoan.amount),
         purpose: newLoan.purpose,
         date: new Date().toLocaleDateString('bn-BD'),
@@ -103,9 +108,14 @@ const LoanManagement = () => {
     }
   };
 
+  const filteredLoans = loans.filter(loan =>
+    loan.memberName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    loan.memberPhone.includes(searchTerm)
+  );
+
   const totalLoans = loans.reduce((sum, loan) => sum + loan.amount, 0);
   const activeLoans = loans.filter(loan => loan.status === "চলমান");
-  const completedLoans = loans.filter(loan => loan.status === "সম্পন্ন");
+  const activeLoanAmount = activeLoans.reduce((sum, loan) => sum + loan.amount, 0);
 
   return (
     <div className="space-y-6">
@@ -203,7 +213,7 @@ const LoanManagement = () => {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">মোট লোন</CardTitle>
@@ -217,51 +227,53 @@ const LoanManagement = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">চলমান লোন</CardTitle>
+            <CardTitle className="text-sm font-medium">লোনের সংখ্যা</CardTitle>
             <Clock className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeLoans.length}</div>
-            <p className="text-xs text-muted-foreground">টি লোন চলমান</p>
+            <div className="text-2xl font-bold">{activeLoans.length}/{loans.length}</div>
+            <p className="text-xs text-muted-foreground">চলমান লোন/মোট লোনের সংখ্যা</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">সম্পন্ন লোন</CardTitle>
+            <CardTitle className="text-sm font-medium">চলমান লোন</CardTitle>
             <Calendar className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{completedLoans.length}</div>
-            <p className="text-xs text-muted-foreground">টি লোন সম্পন্ন</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">আজকের পরিশোধ</CardTitle>
-            <DollarSign className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">১৮,০০০ টাকা</div>
-            <p className="text-xs text-muted-foreground">প্রত্যাশিত পরিশোধ</p>
+            <div className="text-2xl font-bold">{activeLoanAmount.toLocaleString()} টাকা</div>
+            <p className="text-xs text-muted-foreground">মোট চলমান লোনের পরিমাণ</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
-            লোনের তালিকা
-          </CardTitle>
-          <CardDescription>
-            সদস্যদের লোন ও পরিশোধের বিস্তারিত
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                লোনের তালিকা
+              </CardTitle>
+              <CardDescription>
+                সদস্যদের লোন ও পরিশোধের বিস্তারিত
+              </CardDescription>
+            </div>
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+              <Input
+                placeholder="নাম বা ফোন দিয়ে খুঁজুন..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-64"
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {loans.map((loan) => (
+            {filteredLoans.map((loan) => (
               <div key={loan.id} className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -276,6 +288,7 @@ const LoanManagement = () => {
                     <p><span className="font-medium">তারিখ:</span> {loan.date}</p>
                     <p><span className="font-medium">মাসিক পরিশোধ:</span> {loan.monthlyPayment.toLocaleString()} টাকা</p>
                     <p><span className="font-medium">অগ্রগতি:</span> {loan.paidInstallments}/{loan.installments} কিস্তি</p>
+                    <p><span className="font-medium">ফোন:</span> {loan.memberPhone}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">

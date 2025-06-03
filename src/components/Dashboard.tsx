@@ -71,6 +71,15 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
     { type: "সঞ্চয়", member: "করিম মিয়া", amount: "৪,০০০ টাকা", date: "৪ দিন আগে" }
   ];
 
+  // সদস্য অনুযায়ী সঞ্চয়ের ডেটা
+  const memberSavings = [
+    { memberName: "রহিম উদ্দিন", totalSavings: 45000 },
+    { memberName: "ফাতেমা খাতুন", totalSavings: 38000 },
+    { memberName: "করিম মিয়া", totalSavings: 42000 },
+    { memberName: "সালমা খাতুন", totalSavings: 35000 },
+    { memberName: "আব্দুল করিম", totalSavings: 40000 }
+  ];
+
   const handleCardClick = (tab: string) => {
     if (onNavigate) {
       onNavigate(tab);
@@ -147,40 +156,23 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">মাসিক পরিসংখ্যান</CardTitle>
+            <CardTitle className="text-xl">সদস্য অনুযায়ী সঞ্চয়</CardTitle>
             <CardDescription>
-              এই মাসের আর্থিক অগ্রগতি
+              প্রতিটি সদস্যের মোট সঞ্চয়ের পরিমাণ
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">সঞ্চয় সংগ্রহ</span>
-                <div className="text-right">
-                  <p className="font-semibold">৮৫%</p>
-                  <div className="w-24 h-2 bg-gray-200 rounded-full mt-1">
-                    <div className="w-20 h-2 bg-green-500 rounded-full"></div>
+              {memberSavings.map((member, index) => (
+                <div key={index} className="flex justify-between items-center p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <div>
+                    <p className="font-medium text-gray-900">{member.memberName}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-green-600">{member.totalSavings.toLocaleString()} টাকা</p>
                   </div>
                 </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">লোন পরিশোধ</span>
-                <div className="text-right">
-                  <p className="font-semibold">৭২%</p>
-                  <div className="w-24 h-2 bg-gray-200 rounded-full mt-1">
-                    <div className="w-16 h-2 bg-blue-500 rounded-full"></div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">বিনিয়োগ রিটার্ন</span>
-                <div className="text-right">
-                  <p className="font-semibold">৯২%</p>
-                  <div className="w-24 h-2 bg-gray-200 rounded-full mt-1">
-                    <div className="w-22 h-2 bg-purple-500 rounded-full"></div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </CardContent>
         </Card>

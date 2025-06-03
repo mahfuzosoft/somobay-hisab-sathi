@@ -11,13 +11,15 @@ import { Label } from "@/components/ui/label";
 const MemberManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingMember, setEditingMember] = useState<any>(null);
+  const [viewingMember, setViewingMember] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [members, setMembers] = useState([
     {
       id: 1,
       name: "রহিম উদ্দিন",
       phone: "০১৭১২৩৪৫৬৭২",
-      nid: "১২৩৪৫৬৭৮৯০১২৩",
+      nid: "১২৩৪৫৬৭৮৯০১২ৃ",
       address: "ঢাকা, বাংলাদেশ",
       balance: 45000,
       joinDate: "২০২৩-০১-১৫",
@@ -73,6 +75,11 @@ const MemberManagement = () => {
   const handleEditMember = (member: any) => {
     setEditingMember({ ...member });
     setIsEditDialogOpen(true);
+  };
+
+  const handleViewMember = (member: any) => {
+    setViewingMember(member);
+    setIsViewDialogOpen(true);
   };
 
   const handleUpdateMember = () => {
@@ -223,7 +230,7 @@ const MemberManagement = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleViewMember(member)}>
                     <Eye className="w-4 h-4" />
                   </Button>
                   <Button variant="outline" size="sm" onClick={() => handleEditMember(member)}>
@@ -235,6 +242,54 @@ const MemberManagement = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* View Member Dialog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>সদস্যের প্রোফাইল</DialogTitle>
+            <DialogDescription>
+              {viewingMember?.name} এর বিস্তারিত তথ্য
+            </DialogDescription>
+          </DialogHeader>
+          {viewingMember && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">নাম</Label>
+                  <p className="text-lg font-semibold">{viewingMember.name}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">ফোন নম্বর</Label>
+                  <p className="text-lg">{viewingMember.phone}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">জাতীয় পরিচয়পত্র</Label>
+                  <p className="text-lg">{viewingMember.nid}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">যোগদানের তারিখ</Label>
+                  <p className="text-lg">{viewingMember.joinDate}</p>
+                </div>
+                <div className="space-y-2 col-span-2">
+                  <Label className="text-sm font-medium text-gray-500">ঠিকানা</Label>
+                  <p className="text-lg">{viewingMember.address}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">বর্তমান ব্যালেন্স</Label>
+                  <p className="text-2xl font-bold text-green-600">{viewingMember.balance.toLocaleString()} টাকা</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-500">স্ট্যাটাস</Label>
+                  <Badge variant="outline" className="text-green-600 border-green-600">
+                    {viewingMember.status}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Member Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

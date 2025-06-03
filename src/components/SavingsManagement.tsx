@@ -4,18 +4,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Coins, Plus, Calendar, Edit } from "lucide-react";
+import { Coins, Plus, Calendar, Edit, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const SavingsManagement = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [editingSaving, setEditingSaving] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [savings, setSavings] = useState([
     {
       id: 1,
       memberName: "রহিম উদ্দিন",
+      memberPhone: "০১৭১২৩৪৫৬৭২",
       amount: 5000,
       date: "২০২৪-০৬-০১",
       month: "জুন ২০২৪",
@@ -24,6 +26,7 @@ const SavingsManagement = () => {
     {
       id: 2,
       memberName: "ফাতেমা খাতুন",
+      memberPhone: "০১৮১২৩৪৫৬৭৩",
       amount: 4000,
       date: "২০২৪-০৬-০২",
       month: "জুন ২০২৪",
@@ -32,6 +35,7 @@ const SavingsManagement = () => {
     {
       id: 3,
       memberName: "করিম মিয়া",
+      memberPhone: "০১৯১২৩৪৫৬৭৪",
       amount: 4500,
       date: "২০২৪-০৬-০৩",
       month: "জুন ২০২৪",
@@ -57,6 +61,7 @@ const SavingsManagement = () => {
       const saving = {
         id: savings.length + 1,
         memberName: newSaving.memberName,
+        memberPhone: "০১৭xxxxxxxx", // Default phone
         amount: parseInt(newSaving.amount),
         date: new Date().toLocaleDateString('bn-BD'),
         month: newSaving.month,
@@ -81,6 +86,11 @@ const SavingsManagement = () => {
       setEditingSaving(null);
     }
   };
+
+  const filteredSavings = savings.filter(saving =>
+    saving.memberName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    saving.memberPhone.includes(searchTerm)
+  );
 
   const totalSavings = savings.reduce((sum, saving) => sum + saving.amount, 0);
   const currentMonthSavings = savings.filter(s => s.month === "জুন ২০২৪").reduce((sum, saving) => sum + saving.amount, 0);
@@ -195,17 +205,30 @@ const SavingsManagement = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Coins className="w-5 h-5" />
-            সঞ্চয়ের তালিকা
-          </CardTitle>
-          <CardDescription>
-            সদস্যদের মাসিক সঞ্চয়ের বিস্তারিত
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Coins className="w-5 h-5" />
+                সঞ্চয়ের তালিকা
+              </CardTitle>
+              <CardDescription>
+                সদস্যদের মাসিক সঞ্চয়ের বিস্তারিত
+              </CardDescription>
+            </div>
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+              <Input
+                placeholder="নাম বা ফোন দিয়ে খুঁজুন..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-64"
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {savings.map((saving) => (
+            {filteredSavings.map((saving) => (
               <div key={saving.id} className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -217,6 +240,7 @@ const SavingsManagement = () => {
                   <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                     <p><span className="font-medium">মাস:</span> {saving.month}</p>
                     <p><span className="font-medium">তারিখ:</span> {saving.date}</p>
+                    <p><span className="font-medium">ফোন:</span> {saving.memberPhone}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
