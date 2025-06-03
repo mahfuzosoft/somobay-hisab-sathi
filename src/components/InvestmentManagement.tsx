@@ -4,13 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Plus, DollarSign, Target } from "lucide-react";
+import { TrendingUp, Plus, DollarSign, Target, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 const InvestmentManagement = () => {
+  const [editingInvestment, setEditingInvestment] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [investments, setInvestments] = useState([
     {
       id: 1,
@@ -67,6 +69,21 @@ const InvestmentManagement = () => {
       };
       setInvestments([...investments, investment]);
       setNewInvestment({ sector: "", amount: "", description: "", expectedReturn: "" });
+    }
+  };
+
+  const handleEditInvestment = (investment: any) => {
+    setEditingInvestment({ ...investment });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateInvestment = () => {
+    if (editingInvestment) {
+      setInvestments(investments.map(inv => 
+        inv.id === editingInvestment.id ? editingInvestment : inv
+      ));
+      setIsEditDialogOpen(false);
+      setEditingInvestment(null);
     }
   };
 
@@ -237,15 +254,94 @@ const InvestmentManagement = () => {
                     <p><span className="font-medium">বর্তমান মুনাফা:</span> {investment.currentProfit.toLocaleString()} টাকা</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-purple-600">{investment.amount.toLocaleString()} টাকা</p>
-                  <p className="text-sm text-green-600 font-medium">+{investment.currentProfit.toLocaleString()} মুনাফা</p>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-purple-600">{investment.amount.toLocaleString()} টাকা</p>
+                    <p className="text-sm text-green-600 font-medium">+{investment.currentProfit.toLocaleString()} মুনাফা</p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => handleEditInvestment(investment)}>
+                    <Edit className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Investment Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>বিনিয়োগ আপডেট করুন</DialogTitle>
+            <DialogDescription>
+              বিনিয়োগের তথ্য পরিবর্তন করুন
+            </DialogDescription>
+          </DialogHeader>
+          {editingInvestment && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-sector" className="text-right">খাত</Label>
+                <Select value={editingInvestment.sector} onValueChange={(value) => setEditingInvestment({...editingInvestment, sector: value})}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sectors.map((sector) => (
+                      <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-amount" className="text-right">বিনিয়োগ</Label>
+                <Input
+                  id="edit-amount"
+                  type="number"
+                  value={editingInvestment.amount}
+                  onChange={(e) => setEditingInvestment({...editingInvestment, amount: parseInt(e.target.value)})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-profit" className="text-right">বর্তমান মুনাফা</Label>
+                <Input
+                  id="edit-profit"
+                  type="number"
+                  value={editingInvestment.currentProfit}
+                  onChange={(e) => setEditingInvestment({...editingInvestment, currentProfit: parseInt(e.target.value)})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-status" className="text-right">অবস্থা</Label>
+                <Select value={editingInvestment.status} onValueChange={(value) => setEditingInvestment({...editingInvestment, status: value})}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="লাভজনক">লাভজনক</SelectItem>
+                    <SelectItem value="স্থিতিশীল">স্থিতিশীল</SelectItem>
+                    <SelectItem value="নতুন">নতুন</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-description" className="text-right">বিবরণ</Label>
+                <Textarea
+                  id="edit-description"
+                  value={editingInvestment.description}
+                  onChange={(e) => setEditingInvestment({...editingInvestment, description: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          )}
+          <Button onClick={handleUpdateInvestment} className="w-full">
+            বিনিয়োগ আপডেট করুন
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

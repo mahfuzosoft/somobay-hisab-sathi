@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 
 const MemberManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingMember, setEditingMember] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [members, setMembers] = useState([
     {
       id: 1,
@@ -65,6 +67,21 @@ const MemberManagement = () => {
       };
       setMembers([...members, member]);
       setNewMember({ name: "", phone: "", nid: "", address: "", openingBalance: "" });
+    }
+  };
+
+  const handleEditMember = (member: any) => {
+    setEditingMember({ ...member });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateMember = () => {
+    if (editingMember) {
+      setMembers(members.map(m => 
+        m.id === editingMember.id ? editingMember : m
+      ));
+      setIsEditDialogOpen(false);
+      setEditingMember(null);
     }
   };
 
@@ -209,7 +226,7 @@ const MemberManagement = () => {
                   <Button variant="outline" size="sm">
                     <Eye className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleEditMember(member)}>
                     <Edit className="w-4 h-4" />
                   </Button>
                 </div>
@@ -218,6 +235,62 @@ const MemberManagement = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Member Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>সদস্যের তথ্য আপডেট করুন</DialogTitle>
+            <DialogDescription>
+              সদস্যের তথ্য পরিবর্তন করুন
+            </DialogDescription>
+          </DialogHeader>
+          {editingMember && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-name" className="text-right">নাম</Label>
+                <Input
+                  id="edit-name"
+                  value={editingMember.name}
+                  onChange={(e) => setEditingMember({...editingMember, name: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-phone" className="text-right">ফোন</Label>
+                <Input
+                  id="edit-phone"
+                  value={editingMember.phone}
+                  onChange={(e) => setEditingMember({...editingMember, phone: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-address" className="text-right">ঠিকানা</Label>
+                <Input
+                  id="edit-address"
+                  value={editingMember.address}
+                  onChange={(e) => setEditingMember({...editingMember, address: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-balance" className="text-right">ব্যালেন্স</Label>
+                <Input
+                  id="edit-balance"
+                  type="number"
+                  value={editingMember.balance}
+                  onChange={(e) => setEditingMember({...editingMember, balance: parseInt(e.target.value)})}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          )}
+          <Button onClick={handleUpdateMember} className="w-full">
+            তথ্য আপডেট করুন
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

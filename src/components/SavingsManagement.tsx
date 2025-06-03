@@ -4,12 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Coins, Plus, Calendar } from "lucide-react";
+import { Coins, Plus, Calendar, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const SavingsManagement = () => {
+  const [editingSaving, setEditingSaving] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [savings, setSavings] = useState([
     {
       id: 1,
@@ -62,6 +64,21 @@ const SavingsManagement = () => {
       };
       setSavings([...savings, saving]);
       setNewSaving({ memberName: "", amount: "", month: "", date: new Date().toISOString().split('T')[0] });
+    }
+  };
+
+  const handleEditSaving = (saving: any) => {
+    setEditingSaving({ ...saving });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateSaving = () => {
+    if (editingSaving) {
+      setSavings(savings.map(s => 
+        s.id === editingSaving.id ? editingSaving : s
+      ));
+      setIsEditDialogOpen(false);
+      setEditingSaving(null);
     }
   };
 
@@ -202,14 +219,74 @@ const SavingsManagement = () => {
                     <p><span className="font-medium">তারিখ:</span> {saving.date}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-green-600">{saving.amount.toLocaleString()} টাকা</p>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-green-600">{saving.amount.toLocaleString()} টাকা</p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => handleEditSaving(saving)}>
+                    <Edit className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Saving Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>সঞ্চয় আপডেট করুন</DialogTitle>
+            <DialogDescription>
+              সঞ্চয়ের তথ্য পরিবর্তন করুন
+            </DialogDescription>
+          </DialogHeader>
+          {editingSaving && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-member" className="text-right">সদস্য</Label>
+                <Select value={editingSaving.memberName} onValueChange={(value) => setEditingSaving({...editingSaving, memberName: value})}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.map((member) => (
+                      <SelectItem key={member} value={member}>{member}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-amount" className="text-right">পরিমাণ</Label>
+                <Input
+                  id="edit-amount"
+                  type="number"
+                  value={editingSaving.amount}
+                  onChange={(e) => setEditingSaving({...editingSaving, amount: parseInt(e.target.value)})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-month" className="text-right">মাস</Label>
+                <Select value={editingSaving.month} onValueChange={(value) => setEditingSaving({...editingSaving, month: value})}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month) => (
+                      <SelectItem key={month} value={month}>{month}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <Button onClick={handleUpdateSaving} className="w-full">
+            সঞ্চয় আপডেট করুন
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

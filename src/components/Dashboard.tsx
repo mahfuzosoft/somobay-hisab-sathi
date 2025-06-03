@@ -3,49 +3,63 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Users, Coins, Calendar, TrendingUp, Heart, DollarSign } from "lucide-react";
 
-const Dashboard = () => {
+interface DashboardProps {
+  onNavigate?: (tab: string) => void;
+}
+
+const Dashboard = ({ onNavigate }: DashboardProps) => {
   const stats = [
-    {
-      title: "মোট সদস্য",
-      value: "১২৫",
-      icon: Users,
-      color: "from-blue-500 to-blue-600",
-      change: "+৫ এই মাসে"
-    },
     {
       title: "মোট সঞ্চয়",
       value: "৫,৪৫,০০০ টাকা",
       icon: Coins,
       color: "from-green-500 to-green-600",
-      change: "+১২,০০০ এই মাসে"
+      change: "+১২,০০০ এই মাসে",
+      clickable: true,
+      tab: "savings"
     },
     {
       title: "চলমান লোন",
       value: "২,৮৫,০০০ টাকা",
       icon: Calendar,
       color: "from-orange-500 to-orange-600",
-      change: "১৮টি একটিভ লোন"
+      change: "১৮টি একটিভ লোন",
+      clickable: true,
+      tab: "loans"
+    },
+    {
+      title: "মোট বিনিয়োগ",
+      value: "৪,৫০,০০০ টাকা",
+      icon: TrendingUp,
+      color: "from-purple-500 to-purple-600",
+      change: "৩টি সক্রিয় প্রকল্প",
+      clickable: true,
+      tab: "investments"
     },
     {
       title: "বিনিয়োগের মুনাফা",
       value: "৪৫,০০০ টাকা",
       icon: TrendingUp,
-      color: "from-purple-500 to-purple-600",
-      change: "+৮% বৃদ্ধি"
+      color: "from-blue-500 to-blue-600",
+      change: "+৮% বৃদ্ধি",
+      clickable: false
     },
     {
       title: "সাহায্য প্রদান",
       value: "২৮,০০০ টাকা",
       icon: Heart,
       color: "from-red-500 to-red-600",
-      change: "১২টি পরিবারকে"
+      change: "১২টি পরিবারকে",
+      clickable: true,
+      tab: "donations"
     },
     {
       title: "নেট ব্যালেন্স",
       value: "৭,২৫,০০০ টাকা",
       icon: DollarSign,
       color: "from-indigo-500 to-indigo-600",
-      change: "সুস্থিত অবস্থা"
+      change: "সুস্থিত অবস্থা",
+      clickable: false
     }
   ];
 
@@ -57,13 +71,25 @@ const Dashboard = () => {
     { type: "সঞ্চয়", member: "করিম মিয়া", amount: "৪,০০০ টাকা", date: "৪ দিন আগে" }
   ];
 
+  const handleCardClick = (tab: string) => {
+    if (onNavigate) {
+      onNavigate(tab);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+            <Card 
+              key={index} 
+              className={`overflow-hidden hover:shadow-lg transition-shadow duration-300 ${
+                stat.clickable ? 'cursor-pointer hover:scale-105' : ''
+              }`}
+              onClick={() => stat.clickable && stat.tab && handleCardClick(stat.tab)}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">
                   {stat.title}

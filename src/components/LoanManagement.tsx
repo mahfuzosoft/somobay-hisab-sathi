@@ -4,13 +4,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Plus, DollarSign, Clock } from "lucide-react";
+import { Calendar, Plus, DollarSign, Clock, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 const LoanManagement = () => {
+  const [refundingLoan, setRefundingLoan] = useState<any>(null);
+  const [isRefundDialogOpen, setIsRefundDialogOpen] = useState(false);
+  const [refundAmount, setRefundAmount] = useState("");
   const [loans, setLoans] = useState([
     {
       id: 1,
@@ -72,6 +75,31 @@ const LoanManagement = () => {
       };
       setLoans([...loans, loan]);
       setNewLoan({ memberName: "", amount: "", purpose: "", installments: "", monthlyPayment: "" });
+    }
+  };
+
+  const handleRefundLoan = (loan: any) => {
+    setRefundingLoan(loan);
+    setRefundAmount("");
+    setIsRefundDialogOpen(true);
+  };
+
+  const handleProcessRefund = () => {
+    if (refundingLoan && refundAmount) {
+      const refund = parseInt(refundAmount);
+      const updatedLoan = {
+        ...refundingLoan,
+        paidInstallments: Math.min(refundingLoan.paidInstallments + Math.floor(refund / refundingLoan.monthlyPayment), refundingLoan.installments)
+      };
+      
+      if (updatedLoan.paidInstallments >= updatedLoan.installments) {
+        updatedLoan.status = "সম্পন্ন";
+      }
+
+      setLoans(loans.map(l => l.id === refundingLoan.id ? updatedLoan : l));
+      setIsRefundDialogOpen(false);
+      setRefundingLoan(null);
+      setRefundAmount("");
     }
   };
 
@@ -250,20 +278,64 @@ const LoanManagement = () => {
                     <p><span className="font-medium">অগ্রগতি:</span> {loan.paidInstallments}/{loan.installments} কিস্তি</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-orange-600">{loan.amount.toLocaleString()} টাকা</p>
-                  <div className="w-32 h-2 bg-gray-200 rounded-full mt-2">
-                    <div 
-                      className="h-2 bg-orange-500 rounded-full"
-                      style={{ width: `${(loan.paidInstallments / loan.installments) * 100}%` }}
-                    ></div>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-orange-600">{loan.amount.toLocaleString()} টাকা</p>
+                    <div className="w-32 h-2 bg-gray-200 rounded-full mt-2">
+                      <div 
+                        className="h-2 bg-orange-500 rounded-full"
+                        style={{ width: `${(loan.paidInstallments / loan.installments) * 100}%` }}
+                      ></div>
+                    </div>
                   </div>
+                  {loan.status === "চলমান" && (
+                    <Button variant="outline" size="sm" onClick={() => handleRefundLoan(loan)}>
+                      <RefreshCw className="w-4 h-4 mr-1" />
+                      রিফান্ড
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Refund Loan Dialog */}
+      <Dialog open={isRefundDialogOpen} onOpenChange={setIsRefundDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>লোন রিফান্ড করুন</DialogTitle>
+            <DialogDescription>
+              {refundingLoan?.memberName} এর লোন রিফান্ডের পরিমাণ নির্ধারণ করুন
+            </DialogDescription>
+          </DialogHeader>
+          {refundingLoan && (
+            <div className="grid gap-4 py-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">লোনের তথ্য:</h4>
+                <p className="text-sm text-gray-600">মোট লোন: {refundingLoan.amount.toLocaleString()} টাকা</p>
+                <p className="text-sm text-gray-600">মাসিক কিস্তি: {refundingLoan.monthlyPayment.toLocaleString()} টাকা</p>
+                <p className="text-sm text-gray-600">পরিশোধিত কিস্তি: {refundingLoan.paidInstallments}/{refundingLoan.installments}</p>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="refund-amount" className="text-right">রিফান্ড পরিমাণ</Label>
+                <Input
+                  id="refund-amount"
+                  type="number"
+                  value={refundAmount}
+                  onChange={(e) => setRefundAmount(e.target.value)}
+                  className="col-span-3"
+                  placeholder="টাকার পরিমাণ"
+                />
+              </div>
+            </div>
+          )}
+          <Button onClick={handleProcessRefund} className="w-full">
+            রিফান্ড প্রক্রিয়া করুন
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

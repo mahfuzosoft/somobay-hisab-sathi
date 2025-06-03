@@ -4,13 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Plus, Users, DollarSign } from "lucide-react";
+import { Heart, Plus, Users, DollarSign, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 const DonationManagement = () => {
+  const [editingDonation, setEditingDonation] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [donations, setDonations] = useState([
     {
       id: 1,
@@ -68,6 +70,21 @@ const DonationManagement = () => {
       };
       setDonations([...donations, donation]);
       setNewDonation({ recipientName: "", recipientFamily: "", amount: "", purpose: "", category: "" });
+    }
+  };
+
+  const handleEditDonation = (donation: any) => {
+    setEditingDonation({ ...donation });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateDonation = () => {
+    if (editingDonation) {
+      setDonations(donations.map(don => 
+        don.id === editingDonation.id ? editingDonation : don
+      ));
+      setIsEditDialogOpen(false);
+      setEditingDonation(null);
     }
   };
 
@@ -300,14 +317,88 @@ const DonationManagement = () => {
                     <p><span className="font-medium">উদ্দেশ্য:</span> {donation.purpose}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-red-600">{donation.amount.toLocaleString()} টাকা</p>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-red-600">{donation.amount.toLocaleString()} টাকা</p>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => handleEditDonation(donation)}>
+                    <Edit className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Donation Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>সাহায্য আপডেট করুন</DialogTitle>
+            <DialogDescription>
+              সাহায্যের তথ্য পরিবর্তন করুন
+            </DialogDescription>
+          </DialogHeader>
+          {editingDonation && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-recipient" className="text-right">প্রাপকের নাম</Label>
+                <Input
+                  id="edit-recipient"
+                  value={editingDonation.recipientName}
+                  onChange={(e) => setEditingDonation({...editingDonation, recipientName: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-family" className="text-right">পারিবারিক অবস্থা</Label>
+                <Input
+                  id="edit-family"
+                  value={editingDonation.recipientFamily}
+                  onChange={(e) => setEditingDonation({...editingDonation, recipientFamily: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-amount" className="text-right">সাহায্যের পরিমাণ</Label>
+                <Input
+                  id="edit-amount"
+                  type="number"
+                  value={editingDonation.amount}
+                  onChange={(e) => setEditingDonation({...editingDonation, amount: parseInt(e.target.value)})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-category" className="text-right">ক্যাটেগরি</Label>
+                <Select value={editingDonation.category} onValueChange={(value) => setEditingDonation({...editingDonation, category: value})}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-purpose" className="text-right">উদ্দেশ্য</Label>
+                <Textarea
+                  id="edit-purpose"
+                  value={editingDonation.purpose}
+                  onChange={(e) => setEditingDonation({...editingDonation, purpose: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          )}
+          <Button onClick={handleUpdateDonation} className="w-full">
+            সাহায্য আপডেট করুন
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
