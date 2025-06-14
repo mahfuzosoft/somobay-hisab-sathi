@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Coins, Calendar, TrendingUp, Heart, DollarSign } from "lucide-react";
@@ -73,11 +72,11 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
 
   // সদস্য অনুযায়ী সঞ্চয়ের ডেটা
   const memberSavings = [
-    { memberName: "রহিম উদ্দিন", totalSavings: 45000 },
-    { memberName: "ফাতেমা খাতুন", totalSavings: 38000 },
-    { memberName: "করিম মিয়া", totalSavings: 42000 },
-    { memberName: "সালমা খাতুন", totalSavings: 35000 },
-    { memberName: "আব্দুল করিম", totalSavings: 40000 }
+    { memberName: "রহিম উদ্দিন", totalSavings: 45000, currentLoan: 12000 },
+    { memberName: "ফাতেমা খাতুন", totalSavings: 38000, currentLoan: 8000 },
+    { memberName: "করিম মিয়া", totalSavings: 42000, currentLoan: 0 },
+    { memberName: "সালমা খাতুন", totalSavings: 35000, currentLoan: 5000 },
+    { memberName: "আব্দুল করিম", totalSavings: 40000, currentLoan: 3000 }
   ];
 
   const handleCardClick = (tab: string) => {
@@ -133,7 +132,10 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
               {recentActivities.map((activity, index) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="mb-1">
+                      <span className="font-medium text-gray-900">{activity.member}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <Badge variant={
                         activity.type === "সঞ্চয়" ? "default" :
                         activity.type === "লোন" ? "destructive" :
@@ -141,9 +143,9 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
                       }>
                         {activity.type}
                       </Badge>
-                      <span className="font-medium text-gray-900">{activity.member}</span>
+                      <span className="text-gray-400">|</span>
+                      <span className="text-sm text-gray-600">{activity.date}</span>
                     </div>
-                    <p className="text-sm text-gray-600">{activity.date}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-gray-900">{activity.amount}</p>
@@ -156,9 +158,9 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">সদস্য অনুযায়ী সঞ্চয়</CardTitle>
+            <CardTitle className="text-xl">সদস্য সঞ্চয় ও লোন</CardTitle>
             <CardDescription>
-              প্রতিটি সদস্যের মোট সঞ্চয়ের পরিমাণ
+              প্রতিটি সদস্যের মোট সঞ্চয়ের পরিমাণ ও চলমান লোন
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -168,8 +170,11 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
                   <div>
                     <p className="font-medium text-gray-900">{member.memberName}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="flex flex-row items-center gap-6">
                     <p className="font-semibold text-green-600">{member.totalSavings.toLocaleString()} টাকা</p>
+                    <p className="font-semibold text-orange-600">
+                      {member.currentLoan > 0 ? ` ${member.currentLoan.toLocaleString()} টাকা` : "লোন নেই"}
+                    </p>
                   </div>
                 </div>
               ))}
